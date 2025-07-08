@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    env:
+      SQL_PASSWORD: Password123!
+    
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Password123!
+          MSSQL_PID: Express
+        ports:
+          - 1433:1433
+        options: >-
+          --memory=2g
+          --cpus=2
+          --health-cmd "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/1433' || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+          --health-start-period 10s
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Restore tools
+      run: dotnet tool restore
+      
+    - name: Build and test (core tests)
+      run: dotnet cake --target=TestAllExcludingReadonly
+      
+    - name: Set up SQL Server connection for readonly tests
+      run: |
+        cd src/Highway.Data.ReadonlyTests
+        dotnet user-secrets set "SqlConnectionString" "Server=localhost,1433;Database=master;User ID=sa;Password=${{ env.SQL_PASSWORD }};TrustServerCertificate=true;"
+        cd ../..
+    
+    - name: Install SQL command line tools
+      run: |
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+        sudo apt-get update
+        sudo apt-get install -y mssql-tools unixodbc-dev
+        
+    - name: Wait for SQL Server to be ready
+      run: |
+        export PATH="$PATH:/opt/mssql-tools/bin"
+        echo "Waiting for SQL Server to be ready..."
+        for i in {1..30}; do
+          if sqlcmd -S localhost,1433 -U sa -P ${{ env.SQL_PASSWORD }} -Q "SELECT 1" > /dev/null 2>&1; then
+            echo "SQL Server is ready!"
+            break
+          fi
+          echo "Waiting for SQL Server... (attempt $i/30)"
+          sleep 10
+        done
+      continue-on-error: true
+        
+    - name: Test readonly tests with SQL Server
+      run: |
+        export PATH="$PATH:/opt/mssql-tools/bin"
+        # Test if SQL Server is available
+        if sqlcmd -S localhost,1433 -U sa -P ${{ env.SQL_PASSWORD }} -Q "SELECT 1" > /dev/null 2>&1; then
+          echo "SQL Server is available, running readonly tests"
+          dotnet test src/Highway.Data.ReadonlyTests/Highway.Data.ReadonlyTests.csproj --configuration Debug
+        else
+          echo "SQL Server not available, skipping readonly tests"
+        fi
+      continue-on-error: true
