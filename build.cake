@@ -141,6 +141,10 @@ Task("TestAll")
     .IsDependentOn("TestDebug")
     .IsDependentOn("TestRelease");
 
+Task("TestAllExcludingReadonly")
+    .IsDependentOn("TestDebugExcludingReadonly")
+    .IsDependentOn("TestReleaseExcludingReadonly");
+
 Task("TestDebug")
     .IsDependentOn("RebuildDebug")
     .Does(() =>
@@ -152,11 +156,43 @@ Task("TestDebug")
         });
     });
 
+Task("TestDebugExcludingReadonly")
+    .IsDependentOn("RebuildDebug")
+    .Does(() =>
+    {
+        DotNetTest("./src/Highway.Data.Test/Highway.Data.Test.csproj", new DotNetTestSettings
+        {
+            Configuration = debugConfiguration,
+            NoBuild = true,
+        });
+        DotNetTest("./src/Highway.Data.EntityFramework.Test/Highway.Data.EntityFramework.Test.csproj", new DotNetTestSettings
+        {
+            Configuration = debugConfiguration,
+            NoBuild = true,
+        });
+    });
+
 Task("TestRelease")
     .IsDependentOn("RebuildRelease")
     .Does(() =>
     {
         DotNetTest(solutionFile, new DotNetTestSettings
+        {
+            Configuration = releaseConfiguration,
+            NoBuild = true,
+        });
+    });
+
+Task("TestReleaseExcludingReadonly")
+    .IsDependentOn("RebuildRelease")
+    .Does(() =>
+    {
+        DotNetTest("./src/Highway.Data.Test/Highway.Data.Test.csproj", new DotNetTestSettings
+        {
+            Configuration = releaseConfiguration,
+            NoBuild = true,
+        });
+        DotNetTest("./src/Highway.Data.EntityFramework.Test/Highway.Data.EntityFramework.Test.csproj", new DotNetTestSettings
         {
             Configuration = releaseConfiguration,
             NoBuild = true,
