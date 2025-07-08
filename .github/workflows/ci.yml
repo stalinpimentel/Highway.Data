@@ -18,11 +18,11 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: ${{ env.SQL_PASSWORD }}
+          SA_PASSWORD: Password123!
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${{ env.SQL_PASSWORD }} -Q 'SELECT 1'"
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password123! -Q 'SELECT 1'"
           --health-interval 10s
           --health-timeout 3s
           --health-retries 10
