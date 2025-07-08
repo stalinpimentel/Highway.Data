@@ -25,7 +25,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
-		<PackageReference Include="EntityFramework" Version="6.3.0" />
+		<PackageReference Include="EntityFramework" Version="6.5.1" />
 	</ItemGroup>
 
 	<ItemGroup>
