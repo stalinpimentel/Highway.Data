@@ -15,17 +15,21 @@ jobs:
     
     services:
       sqlserver:
-        image: mcr.microsoft.com/mssql/server:2019-latest
+        image: mcr.microsoft.com/mssql/server:2022-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: Password123!
+          MSSQL_PID: Express
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password123! -Q 'SELECT 1'"
+          --memory=2g
+          --cpus=2
+          --health-cmd "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/1433' || exit 1"
           --health-interval 10s
-          --health-timeout 3s
-          --health-retries 10
+          --health-timeout 5s
+          --health-retries 20
+          --health-start-period 10s
     
     steps:
     - uses: actions/checkout@v4
@@ -53,6 +57,20 @@ jobs:
         curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
         sudo apt-get update
         sudo apt-get install -y mssql-tools unixodbc-dev
+        
+    - name: Wait for SQL Server to be ready
+      run: |
+        export PATH="$PATH:/opt/mssql-tools/bin"
+        echo "Waiting for SQL Server to be ready..."
+        for i in {1..30}; do
+          if sqlcmd -S localhost,1433 -U sa -P ${{ env.SQL_PASSWORD }} -Q "SELECT 1" > /dev/null 2>&1; then
+            echo "SQL Server is ready!"
+            break
+          fi
+          echo "Waiting for SQL Server... (attempt $i/30)"
+          sleep 10
+        done
+      continue-on-error: true
         
     - name: Test readonly tests with SQL Server
       run: |
