@@ -1,13 +1,13 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Highway.Data.ReadonlyTests
+namespace Highway.Data.ReadonlyTests;
+
+public sealed class GradeMap : IEntityTypeConfiguration<Grade>
 {
-    public class GradeMap : EntityTypeConfiguration<Grade>
+    public void Configure(EntityTypeBuilder<Grade> builder)
     {
-        public GradeMap()
-        {
-            ToTable("Grade");
-            HasKey(x => x.GradeId);
-        }
+        builder.ToTable("Grade");
+        builder.HasKey(x => x.GradeId);
     }
 }

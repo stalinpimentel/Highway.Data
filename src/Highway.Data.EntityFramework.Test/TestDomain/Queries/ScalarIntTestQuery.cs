@@ -2,13 +2,12 @@
 
 using Highway.Data.Tests.TestDomain;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain.Queries
+namespace Highway.Data.EntityFramework.Test.TestDomain.Queries;
+
+public class ScalarIntTestQuery : Scalar<int>
 {
-    public class ScalarIntTestQuery : Scalar<int>
+    public ScalarIntTestQuery()
     {
-        public ScalarIntTestQuery()
-        {
-            ContextQuery = db => db.AsQueryable<Foo>().Count();
-        }
+        ContextQuery = db => db.AsQueryable<Foo>().Count();
     }
 }

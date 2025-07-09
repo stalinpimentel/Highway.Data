@@ -1,12 +1,11 @@
 ﻿using Highway.Data.Tests.TestDomain;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain.Queries
+namespace Highway.Data.EntityFramework.Test.TestDomain.Queries;
+
+public class FindFoo : Query<Foo>
 {
-    public class FindFoo : Query<Foo>
+    public FindFoo()
     {
-        public FindFoo()
-        {
-            ContextQuery = c => c.AsQueryable<Foo>();
-        }
+        ContextQuery = c => c.AsQueryable<Foo>();
     }
 }

@@ -1,19 +1,18 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
+namespace Highway.Data.EntityFramework.Test.TestDomain;
+
+public class BaseMappingConfiguration : IMappingConfiguration
 {
-    public class BaseMappingConfiguration : IMappingConfiguration
+    public BaseMappingConfiguration()
     {
-        public BaseMappingConfiguration()
-        {
-            Configured = false;
-        }
+        Configured = false;
+    }
 
-        public bool Configured { get; set; }
+    public bool Configured { get; set; }
 
-        public virtual void ConfigureModelBuilder(DbModelBuilder modelBuilder)
-        {
-            Configured = true;
-        }
+    public virtual void ConfigureModelBuilder(ModelBuilder modelBuilder)
+    {
+        Configured = true;
     }
 }

@@ -1,20 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace System.Linq
+namespace System.Linq;
+
+public static class ObservableExtension
 {
-    public static class ObservableExtension
+    public static ObservableCollection<T> ToObservableList<T>(this IEnumerable<T> data)
     {
-        public static ObservableCollection<T> ToObservableList<T>(this IEnumerable<T> data)
-        {
-            var dataToReturn = new ObservableCollection<T>();
-
-            foreach (var t in data)
-            {
-                dataToReturn.Add(t);
-            }
-
-            return dataToReturn;
-        }
+        return new ObservableCollection<T>(data);
     }
 }

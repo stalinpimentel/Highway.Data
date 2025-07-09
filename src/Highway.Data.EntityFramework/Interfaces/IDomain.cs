@@ -2,16 +2,17 @@
 
 using Highway.Data.EventManagement.Interfaces;
 
-namespace Highway.Data
+using Microsoft.EntityFrameworkCore;
+
+namespace Highway.Data;
+
+public interface IDomain
 {
-    public interface IDomain
-    {
-        string ConnectionString { get; }
+    DbContextOptions Options { get; }
 
-        IContextConfiguration Context { get; }
+    IContextConfiguration Context { get; }
 
-        List<IInterceptor> Events { get; }
+    List<IInterceptor> Events { get; }
 
-        IMappingConfiguration Mappings { get; }
-    }
+    IMappingConfiguration Mappings { get; }
 }

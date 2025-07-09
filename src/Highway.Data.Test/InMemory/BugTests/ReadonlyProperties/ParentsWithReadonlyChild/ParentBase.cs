@@ -1,46 +1,45 @@
 using System.Threading;
 
-namespace Highway.Data.Test.InMemory.BugTests.ReadonlyProperties.ParentsWithReadonlyChild
+namespace Highway.Data.Test.InMemory.BugTests.ReadonlyProperties.ParentsWithReadonlyChild;
+
+public class ParentBase : IIdentifiable<long>
 {
-    public class ParentBase : IIdentifiable<long>
+    private static Child _child;
+
+    private readonly ReaderWriterLockSlim _lock = new();
+
+    public Child Child
     {
-        private static Child _child;
-
-        private readonly ReaderWriterLockSlim _lock = new();
-
-        public Child Child
+        get
         {
-            get
-            {
-                _lock.EnterUpgradeableReadLock();
-                try
-                {
-                    _child ??= BuildChild();
-                }
-                finally
-                {
-                    _lock.ExitUpgradeableReadLock();
-                }
-
-                return _child;
-            }
-        }
-
-        public long Id { get; set; }
-
-        public string Name { get; set; }
-
-        private Child BuildChild()
-        {
-            _lock.EnterWriteLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return new Child { Name = nameof(Child) };
+                _child ??= BuildChild();
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _lock.ExitUpgradeableReadLock();
             }
+
+            return _child;
+        }
+    }
+
+    public long Id { get; set; }
+
+    public string Name { get; set; }
+
+    private Child BuildChild()
+    {
+        _lock.EnterWriteLock();
+        try
+        {
+            return new Child { Name = nameof(Child) };
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.ReadonlyTests
+namespace Highway.Data.ReadonlyTests;
+
+internal class GetStudents : Query<Student>
 {
-    internal class GetStudents : Query<Student>
+    public GetStudents()
     {
-        public GetStudents()
-        {
-            ContextQuery = source => source.AsQueryable<Student>().Include(x => x.Grade);
-        }
+        ContextQuery = source => source.AsQueryable<Student>().Include(x => x.Grade);
     }
 }

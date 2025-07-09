@@ -11,10 +11,11 @@
 		<PackageTags>Architecture ORM Repository Specification Productivity</PackageTags>
 		<PackageReleaseNotes />
 		<PackageIcon>icon.png</PackageIcon>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
+		<TargetFramework>net9.0</TargetFramework>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<RootNamespace>Highway.Data</RootNamespace>
 	</PropertyGroup>
@@ -25,7 +26,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
-		<PackageReference Include="EntityFramework" Version="6.5.1" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
 	</ItemGroup>
 
 	<ItemGroup>

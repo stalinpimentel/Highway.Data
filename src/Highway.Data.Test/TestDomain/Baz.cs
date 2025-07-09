@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace Highway.Data.Tests.TestDomain
+namespace Highway.Data.Tests.TestDomain;
+
+public class Baz
 {
-    public class Baz
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Name { get; set; }
+    public string? Name { get; set; }
 
-        public ICollection<Qux> Quxes { get; set; }
-    }
+    public ICollection<Qux> Quxes { get; set; }
 }

@@ -1,26 +1,25 @@
 ﻿using Highway.Data.EventManagement;
 
-namespace Highway.Data.Repositories
+namespace Highway.Data.Repositories;
+
+public class ReadonlyDomainRepository<T> : ReadonlyRepository, IReadonlyDomainRepository<T>
+    where T : class, IDomain
 {
-    public class ReadonlyDomainRepository<T> : ReadonlyRepository, IReadonlyDomainRepository<T>
-        where T : class, IDomain
+    public ReadonlyDomainRepository(IReadonlyDomainContext<T> context, T domain)
+        : base(context)
     {
-        public ReadonlyDomainRepository(IReadonlyDomainContext<T> context, T domain)
-            : base(context)
+        var eventManager = new ReadonlyEventManager<T>(this);
+
+        if (domain.Events == null)
         {
-            var eventManager = new ReadonlyEventManager<T>(this);
-
-            if (domain.Events == null)
-            {
-                return;
-            }
-
-            foreach (var @event in domain.Events)
-            {
-                eventManager.Register(@event);
-            }
+            return;
         }
 
-        public IReadonlyDomainContext<T> DomainContext => (IReadonlyDomainContext<T>)Context;
+        foreach (var @event in domain.Events)
+        {
+            eventManager.Register(@event);
+        }
     }
+
+    public IReadonlyDomainContext<T> DomainContext => (IReadonlyDomainContext<T>)Context;
 }
