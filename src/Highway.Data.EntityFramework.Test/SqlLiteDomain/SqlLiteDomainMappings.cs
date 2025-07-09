@@ -1,12 +1,11 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.EntityFramework.Test.SqlLiteDomain
+namespace Highway.Data.EntityFramework.Test.SqlLiteDomain;
+
+public class SqlLiteDomainMappings : IMappingConfiguration
 {
-    public class SqlLiteDomainMappings : IMappingConfiguration
+    public void ConfigureModelBuilder(ModelBuilder modelBuilder)
     {
-        public void ConfigureModelBuilder(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Person>().HasKey(e => e.Id);
-        }
+        modelBuilder.Entity<Person>().HasKey(e => e.Id);
     }
 }

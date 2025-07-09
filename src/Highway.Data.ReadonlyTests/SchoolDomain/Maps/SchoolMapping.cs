@@ -1,13 +1,12 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.ReadonlyTests
+namespace Highway.Data.ReadonlyTests;
+
+public class SchoolMapping : IMappingConfiguration
 {
-    public class SchoolMapping : IMappingConfiguration
+    public void ConfigureModelBuilder(ModelBuilder modelBuilder)
     {
-        public void ConfigureModelBuilder(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Configurations.Add(new GradeMap());
-            modelBuilder.Configurations.Add(new StudentMap());
-        }
+        modelBuilder.ApplyConfiguration(new GradeMap());
+        modelBuilder.ApplyConfiguration(new StudentMap());
     }
 }

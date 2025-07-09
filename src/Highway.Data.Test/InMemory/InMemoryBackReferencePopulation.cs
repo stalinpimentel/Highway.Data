@@ -7,55 +7,54 @@ using Highway.Data.Tests.InMemory.Domain;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Highway.Data.Tests.InMemory
+namespace Highway.Data.Tests.InMemory;
+
+[TestClass]
+public class InMemoryBackReferencePopulation
 {
-    [TestClass]
-    public class InMemoryBackReferencePopulation
+    [TestMethod]
+    public void ShouldPopulateCollectionBasedReference()
     {
-        [TestMethod]
-        public void ShouldPopulateCollectionBasedReference()
-        {
-            var context = new InMemoryDataContext();
+        var context = new InMemoryDataContext();
 
-            var child = new Post();
-            var blog = new Blog("Test");
-            child.Blog = blog;
+        var child = new Post();
+        var blog = new Blog("Test");
+        child.Blog = blog;
 
-            context.Add(child);
-            context.Commit();
+        context.Add(child);
+        context.Commit();
 
-            blog.Posts.Count(x => x == child).Should().Be(1);
-        }
+        blog.Posts.Count(x => x == child).Should().Be(1);
+    }
 
-        [TestMethod]
-        public void ShouldPopulateCollectionBasedReferenceReplacingNullCollection()
-        {
-            var context = new InMemoryDataContext();
+    [TestMethod]
+    public void ShouldPopulateCollectionBasedReferenceReplacingNullCollection()
+    {
+        var context = new InMemoryDataContext();
 
-            var child = new Post();
-            var blog = new Blog("Test");
-            child.Blog = blog;
-            blog.Posts = null;
+        var child = new Post();
+        var blog = new Blog("Test");
+        child.Blog = blog;
+        blog.Posts = null;
 
-            context.Add(child);
-            context.Commit();
+        context.Add(child);
+        context.Commit();
 
-            blog.Posts.Count(x => x == child).Should().Be(1);
-        }
+        blog.Posts.Count(x => x == child).Should().Be(1);
+    }
 
-        [TestMethod]
-        public void ShouldPopulateSingleReference()
-        {
-            var context = new InMemoryDataContext();
+    [TestMethod]
+    public void ShouldPopulateSingleReference()
+    {
+        var context = new InMemoryDataContext();
 
-            var child = new Post();
-            var blog = new Blog("Test");
-            blog.Posts.Add(child);
+        var child = new Post();
+        var blog = new Blog("Test");
+        blog.Posts.Add(child);
 
-            context.Add(blog);
-            context.Commit();
+        context.Add(blog);
+        context.Commit();
 
-            child.Blog.Should().NotBeNull();
-        }
+        child.Blog.Should().NotBeNull();
     }
 }

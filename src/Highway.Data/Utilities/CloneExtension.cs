@@ -3,132 +3,131 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Highway.Data.Utilities
+namespace Highway.Data.Utilities;
+
+public static class CloneExtension
 {
-   public static class CloneExtension
+    private static IDictionary<object, object> OriginalToCloneMap;
+
+    public static T Clone<T>(this T originalObject, IDictionary<object, object> existingOriginalToCloneMap) where T : class
     {
-        private static IDictionary<object, object> OriginalToCloneMap;
+        OriginalToCloneMap = existingOriginalToCloneMap ?? new Dictionary<object, object>();
 
-        public static T Clone<T>(this T originalObject, IDictionary<object, object> existingOriginalToCloneMap) where T : class
+        return ExecuteClone(originalObject);
+    }
+
+    public static T Clone<T>(this T originalObject) where T : class
+    {
+        return Clone(originalObject, null);
+    }
+
+    public static T ExecuteClone<T>(this T originalObject) where T : class
+    {
+        if (OriginalToCloneMap.ContainsKey(originalObject))
         {
-            OriginalToCloneMap = existingOriginalToCloneMap ?? new Dictionary<object, object>();
-
-            return ExecuteClone(originalObject);
+            return (T)OriginalToCloneMap[originalObject];
         }
 
-        public static T Clone<T>(this T originalObject) where T : class
+        var cloneObject = InstantiateClone(originalObject);
+
+        if (originalObject is IEnumerable)
         {
-            return Clone(originalObject, null);
-        }
-
-        public static T ExecuteClone<T>(this T originalObject) where T : class
-        {
-            if (OriginalToCloneMap.ContainsKey(originalObject))
-            {
-                return (T)OriginalToCloneMap[originalObject];
-            }
-
-            var cloneObject = InstantiateClone(originalObject);
-
-            if (originalObject is IEnumerable)
-            {
-                return cloneObject;
-            }
-
-            CloneFields(originalObject, cloneObject);
-
             return cloneObject;
         }
 
-        private static void CloneFields<T>(T originalObject, T cloneObject)
+        CloneFields(originalObject, cloneObject);
+
+        return cloneObject;
+    }
+
+    private static void CloneFields<T>(T originalObject, T cloneObject)
+    {
+        Type type = originalObject.GetType();
+
+        do
         {
-            Type type = originalObject.GetType();
+            CloneFieldsForType(originalObject, cloneObject, type);
 
-            do
-            {
-                CloneFieldsForType(originalObject, cloneObject, type);
+            type = type.BaseType;
+        } while (type != null);
+    }
 
-                type = type.BaseType;
-            } while (type != null);
-        }
+    private static void CloneFieldsForType<T>(T originalObject, T cloneObject, Type type)
+    {
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-        private static void CloneFieldsForType<T>(T originalObject, T cloneObject, Type type)
+        foreach (var field in fields)
         {
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = type.GetField(field.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            var value = fieldInfo.GetValue(originalObject);
 
-            foreach (var field in fields)
+            if (value == null)
             {
-                var fieldInfo = type.GetField(field.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-                var value = fieldInfo.GetValue(originalObject);
-
-                if (value == null)
-                {
-                    continue;
-                }
-
-                if (fieldInfo.FieldType.IsPrimitive || fieldInfo.FieldType == typeof(string) || fieldInfo.FieldType == typeof(Guid))
-                {
-                    fieldInfo.SetValue(cloneObject, value);
-                }
-                else
-                {
-                    var methodInfo = typeof(CloneExtension).GetMethod("ExecuteClone");
-                    var genericMethod = methodInfo.MakeGenericMethod(value.GetType());
-
-                    fieldInfo.SetValue(cloneObject, genericMethod.Invoke(value, new[] { value }));
-                }
-            }
-        }
-
-        private static T InstantiateClone<T>(T originalObject)
-        {
-            return originalObject is IEnumerable
-                ? InstantiateCollectionClone(originalObject)
-                : InstantiateClassClone(originalObject);
-        }
-
-        private static T InstantiateClassClone<T>(T classObject)
-        {
-            Type t = classObject.GetType();
-
-            ConstructorInfo ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                Type.DefaultBinder, Type.EmptyTypes, null);
-
-            T cloneObject;
-
-            try
-            {
-                cloneObject = (T)ci.Invoke(null);
-            }
-            catch (NullReferenceException e)
-            {
-                throw new MissingMethodException($"Possible missing default constructor for {t}. Can be private. Required for EF as well.", e);
+                continue;
             }
 
-            OriginalToCloneMap.Add(classObject, cloneObject);
-            return cloneObject;
-        }
+            if (fieldInfo.FieldType.IsPrimitive || fieldInfo.FieldType == typeof(string) || fieldInfo.FieldType == typeof(Guid))
+            {
+                fieldInfo.SetValue(cloneObject, value);
+            }
+            else
+            {
+                var methodInfo = typeof(CloneExtension).GetMethod("ExecuteClone");
+                var genericMethod = methodInfo.MakeGenericMethod(value.GetType());
 
-        private static T InstantiateCollectionClone<T>(T originalCollection)
+                fieldInfo.SetValue(cloneObject, genericMethod.Invoke(value, new[] { value }));
+            }
+        }
+    }
+
+    private static T InstantiateClone<T>(T originalObject)
+    {
+        return originalObject is IEnumerable
+            ? InstantiateCollectionClone(originalObject)
+            : InstantiateClassClone(originalObject);
+    }
+
+    private static T InstantiateClassClone<T>(T classObject)
+    {
+        Type t = classObject.GetType();
+
+        ConstructorInfo ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                                              Type.DefaultBinder, Type.EmptyTypes, null);
+
+        T cloneObject;
+
+        try
         {
-            var collectionType = originalCollection.GetType().GetGenericTypeDefinition();
-            Type genericType = collectionType.MakeGenericType(
-                originalCollection.GetType().GetGenericArguments());
-            var cloneCollection = (T)Activator.CreateInstance(genericType);
-
-            if (!typeof(IList).IsAssignableFrom(collectionType))
-            {
-                throw new NotSupportedException("Uncertain of what other collection types to handle.");
-            }
-
-            OriginalToCloneMap.Add(originalCollection, cloneCollection);
-
-            foreach (var item in (IEnumerable)originalCollection)
-            {
-                ((IList)cloneCollection).Add(ExecuteClone(item));
-            }
-
-            return cloneCollection;
+            cloneObject = (T)ci.Invoke(null);
         }
+        catch (NullReferenceException e)
+        {
+            throw new MissingMethodException($"Possible missing default constructor for {t}. Can be private. Required for EF as well.", e);
+        }
+
+        OriginalToCloneMap.Add(classObject, cloneObject);
+        return cloneObject;
+    }
+
+    private static T InstantiateCollectionClone<T>(T originalCollection)
+    {
+        var collectionType = originalCollection.GetType().GetGenericTypeDefinition();
+        Type genericType = collectionType.MakeGenericType(
+            originalCollection.GetType().GetGenericArguments());
+        var cloneCollection = (T)Activator.CreateInstance(genericType);
+
+        if (!typeof(IList).IsAssignableFrom(collectionType))
+        {
+            throw new NotSupportedException("Uncertain of what other collection types to handle.");
+        }
+
+        OriginalToCloneMap.Add(originalCollection, cloneCollection);
+
+        foreach (var item in (IEnumerable)originalCollection)
+        {
+            ((IList)cloneCollection).Add(ExecuteClone(item));
+        }
+
+        return cloneCollection;
     }
 }

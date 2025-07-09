@@ -7,64 +7,63 @@ using Highway.Data.Contexts;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Highway.Data.Tests.InMemory.BugTests
+namespace Highway.Data.Tests.InMemory.BugTests;
+
+[TestClass]
+public class TestThrowsExceptionWithDuplicateElement
 {
-    [TestClass]
-    public class TestThrowsExceptionWithDuplicateElement
+    private IDataContext _context;
+
+    [TestMethod]
+    public void ShouldNotThrowErrorOnCommit()
     {
-        private IDataContext _context;
+        _context = new InMemoryDataContext();
+        var entityType = new EntityType { Id = 1, EntityTypeName = "Customer" };
+        _context.Add(entityType);
+        _context.Commit();
 
-        [TestMethod]
-        public void ShouldNotThrowErrorOnCommit()
+        var businessEntity = new BusinessEntity(
+            new List<EntityType>
+                { entityType });
+
+        _context.Add(businessEntity);
+        _context.Commit();
+    }
+
+    [TestMethod]
+    public void ShouldRetrieveWithChildProperty()
+    {
+        _context = new InMemoryDataContext();
+        var entityType = new EntityType { Id = 1, EntityTypeName = "Customer" };
+        _context.Add(entityType);
+        _context.Commit();
+
+        var businessEntity = new BusinessEntity(
+            new List<EntityType>
+                { entityType });
+
+        _context.Add(businessEntity);
+        _context.Commit();
+
+        entityType.Should().Be(_context.AsQueryable<BusinessEntity>().Single().EntityTypes.First());
+    }
+
+    private class BusinessEntity : IIdentifiable<long>
+    {
+        public BusinessEntity(List<EntityType> entityTypes)
         {
-            _context = new InMemoryDataContext();
-            var entityType = new EntityType { Id = 1, EntityTypeName = "Customer" };
-            _context.Add(entityType);
-            _context.Commit();
-
-            var businessEntity = new BusinessEntity(
-                new List<EntityType>
-                    { entityType });
-
-            _context.Add(businessEntity);
-            _context.Commit();
+            EntityTypes = entityTypes;
         }
 
-        [TestMethod]
-        public void ShouldRetrieveWithChildProperty()
-        {
-            _context = new InMemoryDataContext();
-            var entityType = new EntityType { Id = 1, EntityTypeName = "Customer" };
-            _context.Add(entityType);
-            _context.Commit();
+        public List<EntityType> EntityTypes { get; }
 
-            var businessEntity = new BusinessEntity(
-                new List<EntityType>
-                    { entityType });
+        public long Id { get; set; }
+    }
 
-            _context.Add(businessEntity);
-            _context.Commit();
+    private class EntityType
+    {
+        public string EntityTypeName { get; set; }
 
-            entityType.Should().Be(_context.AsQueryable<BusinessEntity>().Single().EntityTypes.First());
-        }
-
-        private class BusinessEntity : IIdentifiable<long>
-        {
-            public BusinessEntity(List<EntityType> entityTypes)
-            {
-                EntityTypes = entityTypes;
-            }
-
-            public List<EntityType> EntityTypes { get; }
-
-            public long Id { get; set; }
-        }
-
-        private class EntityType
-        {
-            public string EntityTypeName { get; set; }
-
-            public int Id { get; set; }
-        }
+        public int Id { get; set; }
     }
 }

@@ -1,16 +1,15 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data
+namespace Highway.Data;
+
+/// <summary>
+///     Implement this interface to pass the context specific mapping to the constructor
+/// </summary>
+public interface IContextConfiguration
 {
     /// <summary>
-    ///     Implement this interface to pass the context specific mapping to the constructor
+    ///     This method allows the configuration of context specific properties to be injected
     /// </summary>
-    public interface IContextConfiguration
-    {
-        /// <summary>
-        ///     This method allows the configuration of context specific properties to be injected
-        /// </summary>
-        /// <param name="context">the context that is being configured</param>
-        void ConfigureContext(DbContext context);
-    }
+    /// <param name="context">the context that is being configured</param>
+    void ConfigureContext(DbContext context);
 }

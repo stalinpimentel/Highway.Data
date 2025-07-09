@@ -1,20 +1,21 @@
 using System;
-using System.Data.Entity;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data
+namespace Highway.Data;
+
+public abstract class SqlScalar<T> : IScalar<T>
 {
-    public abstract class SqlScalar<T> : IScalar<T>
-    {
-        protected Func<SqlConnection, T> ContextQuery;
+    protected Func<SqlConnection, T> ContextQuery;
 
-        public T Execute(IDataSource context)
+    public T Execute(IDataSource context)
+    {
+        if (context is not DbContext efContext)
         {
-            var efContext = context as DbContext;
-            using (var conn = new SqlConnection(efContext.Database.Connection.ConnectionString))
-            {
-                return ContextQuery.Invoke(conn);
-            }
+            throw new ArgumentException($"{nameof(context)} must be of type {nameof(DbContext)}.", nameof(context));
         }
+        using var conn = new SqlConnection(efContext.Database.GetConnectionString());
+
+        return ContextQuery.Invoke(conn);
     }
 }

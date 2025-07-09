@@ -2,16 +2,26 @@
 
 using Highway.Data.EventManagement.Interfaces;
 
-namespace Highway.Data.ReadonlyTests
+using Microsoft.EntityFrameworkCore;
+
+namespace Highway.Data.ReadonlyTests;
+
+public class SchoolDomain : IDomain
 {
-    public class SchoolDomain : IDomain
+    public string ConnectionString { get; } = Configuration.Instance.TestDatabaseConnectionString;
+
+    public DbContextOptions Options { get; }
+
+    public IContextConfiguration Context { get; } = new DefaultContextConfiguration();
+
+    public List<IInterceptor> Events { get; } = new();
+
+    public IMappingConfiguration Mappings { get; } = new SchoolMapping();
+
+    public SchoolDomain()
     {
-        public string ConnectionString { get; } = Configuration.Instance.TestDatabaseConnectionString;
-
-        public IContextConfiguration Context { get; } = new DefaultContextConfiguration();
-
-        public List<IInterceptor> Events { get; } = new();
-
-        public IMappingConfiguration Mappings { get; } = new SchoolMapping();
+        Options = new DbContextOptionsBuilder()
+                  .UseSqlServer(ConnectionString, opts => opts.EnableRetryOnFailure())
+            .Options;
     }
 }

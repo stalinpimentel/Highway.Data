@@ -2,21 +2,20 @@
 
 using Highway.Data.Interceptors.Events;
 
-namespace Highway.Data
+namespace Highway.Data;
+
+/// <summary>
+///     The standard interface used to interact with an ORM specific implementation
+/// </summary>
+public interface IDataContext : IDataSource, IDisposable, IUnitOfWork
 {
     /// <summary>
-    ///     The standard interface used to interact with an ORM specific implementation
+    ///     The event fired just before the commit of the persistence
     /// </summary>
-    public interface IDataContext : IDataSource, IDisposable, IUnitOfWork
-    {
-        /// <summary>
-        ///     The event fired just before the commit of the persistence
-        /// </summary>
-        event EventHandler<BeforeSave> BeforeSave;
+    event EventHandler<BeforeSaveEventArgs> BeforeSave;
 
-        /// <summary>
-        ///     The event fired just after the commit of the persistence
-        /// </summary>
-        event EventHandler<AfterSave> AfterSave;
-    }
+    /// <summary>
+    ///     The event fired just after the commit of the persistence
+    /// </summary>
+    event EventHandler<AfterSaveEventArgs> AfterSave;
 }

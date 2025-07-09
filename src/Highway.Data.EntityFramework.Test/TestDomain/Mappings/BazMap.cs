@@ -1,17 +1,17 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using Highway.Data.Tests.TestDomain;
 
-using Highway.Data.Tests.TestDomain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
+namespace Highway.Data.EntityFramework.Test.TestDomain;
+
+public sealed class BazMap : IEntityTypeConfiguration<Baz>
 {
-    public class BazMap : EntityTypeConfiguration<Baz>
+    public void Configure(EntityTypeBuilder<Baz> builder)
     {
-        public BazMap()
-        {
-            ToTable("Bazs");
-            HasKey(x => x.Id);
-            Property(x => x.Name).IsOptional();
-            HasMany(x => x.Quxes).WithOptional();
-        }
+        builder.ToTable("Bazs");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Name).IsRequired(false);
+        builder.HasMany(x => x.Quxes).WithOne();
     }
 }

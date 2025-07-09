@@ -1,14 +1,13 @@
 ﻿using Common.Logging;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
-{
-    public class TestReadonlyDataContext : ReadonlyDataContext
-    {
-        public TestReadonlyDataContext(string connectionString, ILog logger)
-            : base(connectionString, null, logger)
-        {
-        }
+using Microsoft.EntityFrameworkCore;
 
-        public string ConnectionString { get; set; }
+namespace Highway.Data.EntityFramework.Test.TestDomain;
+
+public class TestReadonlyDataContext : ReadonlyDataContext
+{
+    public TestReadonlyDataContext(DbContextOptions options, ILog logger)
+        : base(options, null, null, logger)
+    {
     }
 }
