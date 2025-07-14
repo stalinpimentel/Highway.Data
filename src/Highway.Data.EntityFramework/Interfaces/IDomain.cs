@@ -10,9 +10,9 @@ public interface IDomain
 {
     DbContextOptions Options { get; }
 
-    IContextConfiguration Context { get; }
+    IContextOptionsConfigurator? ContextOptionsConfigurator { get; }
 
-    List<IInterceptor> Events { get; }
+    List<IInterceptor>? Events { get; }
 
     IMappingConfiguration Mappings { get; }
 }

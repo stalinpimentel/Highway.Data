@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Highway.Data.Contexts.TypeRepresentations;
@@ -56,16 +57,17 @@ public class InMemoryDataContext : IDataContext, IReadonlyDataContext
         return 0;
     }
 
-    public virtual Task<int> CommitAsync()
+    public virtual Task<int> CommitAsync(CancellationToken cancellationToken = default)
     {
-        var task = new Task<int>(Commit);
+        var task = new Task<int>(Commit, cancellationToken);
         task.Start();
 
         return task;
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -110,19 +112,13 @@ public class InMemoryDataContext : IDataContext, IReadonlyDataContext
     protected virtual void OnAfterSave(AfterSaveEventArgs e)
     {
         var handler = AfterSave;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 
     protected virtual void OnBeforeSave(BeforeSaveEventArgs e)
     {
         var handler = BeforeSave;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 
     /// <summary>

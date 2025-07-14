@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 namespace Highway.Data.Contexts;
 
@@ -14,7 +15,7 @@ public abstract class IdentityStrategy<TType, TIdentity> : IIdentityStrategy<TTy
 {
     private readonly Action<TType> _identitySetter;
 
-    private readonly object _lastValueLock = new object();
+    private readonly Lock _lastValueLock = new();
 
     /// <summary>
     ///     Creates an instance of <see cref="IdentityStrategy{TType,TIdentity}" /> using the provided identity
@@ -37,7 +38,7 @@ public abstract class IdentityStrategy<TType, TIdentity> : IIdentityStrategy<TTy
     /// <summary>
     ///     The function used to generate identity values.
     /// </summary>
-    public Func<TIdentity> Generator { get; protected set; } = null;
+    public Func<TIdentity>? Generator { get; protected set; } = null;
 
     /// <summary>
     ///     The last value used to set an identity value.
@@ -57,12 +58,12 @@ public abstract class IdentityStrategy<TType, TIdentity> : IIdentityStrategy<TTy
     ///     Invokes the generator to set the next appropriate value for the identity value.
     /// </summary>
     /// <returns>The next appropriate value for the identity value.</returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
     public TIdentity Next()
     {
-        if (Generator == null)
+        if (Generator is null)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("A generator function has not been set for this identity strategy.");
         }
 
         return Generator.Invoke();
@@ -87,7 +88,7 @@ public abstract class IdentityStrategy<TType, TIdentity> : IIdentityStrategy<TTy
         }
     }
 
-    private PropertyInfo GetPropertyFromExpression(Expression<Func<TType, TIdentity>> lambda)
+    private static PropertyInfo GetPropertyFromExpression(Expression<Func<TType, TIdentity>> lambda)
     {
         MemberExpression memberExpression;
 
@@ -110,7 +111,7 @@ public abstract class IdentityStrategy<TType, TIdentity> : IIdentityStrategy<TTy
         }
         else
         {
-            throw new ArgumentException();
+            throw new ArgumentException("The expression must be a unary or member expression.", nameof(lambda));
         }
 
         return (PropertyInfo)memberExpression.Member;

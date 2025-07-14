@@ -2,12 +2,10 @@
 using System.Linq;
 
 using Common.Logging;
-using Common.Logging.Simple;
 
 using Highway.Data.EntityFramework;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Highway.Data;
 
@@ -18,10 +16,9 @@ public class ReadonlyDataContext : ReadonlyDbContext, IReadonlyEntityDataContext
     /// </summary>
     /// <param name="options">The standard SQL connection string for the Database</param>
     /// <param name="mapping">The Mapping Configuration that will determine how the tables and objects interact</param>
-    /// <param name="contextConfig"></param>
     /// <param name="log"></param>
-    public ReadonlyDataContext(DbContextOptions options, IMappingConfiguration? mapping, IContextConfiguration? contextConfig, ILog log)
-        : base(options, mapping, contextConfig, log)
+    public ReadonlyDataContext(DbContextOptions options, IMappingConfiguration? mapping, ILog log)
+        : base(options, mapping, log)
     {
     }
 
@@ -49,7 +46,7 @@ public class ReadonlyDataContext : ReadonlyDbContext, IReadonlyEntityDataContext
         where T : class
     {
         var entry = Entry(item);
-        if (entry == null)
+        if (entry is null)
         {
             throw new InvalidOperationException("You cannot reload an object that is not in the current Entity Framework data context");
         }

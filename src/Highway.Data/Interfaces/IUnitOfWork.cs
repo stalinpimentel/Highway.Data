@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Highway.Data;
 
@@ -26,7 +27,7 @@ public interface IUnitOfWork
     ///     Commits all currently tracked entity changes asynchronously
     /// </summary>
     /// <returns>the number of rows affected</returns>
-    Task<int> CommitAsync();
+    Task<int> CommitAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Reloads the provided instance of <typeparamref name="T" /> from the database

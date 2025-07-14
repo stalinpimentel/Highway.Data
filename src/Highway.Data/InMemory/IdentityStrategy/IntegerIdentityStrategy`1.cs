@@ -8,7 +8,7 @@ namespace Highway.Data.Contexts;
 ///     type int
 /// </summary>
 /// <typeparam name="T">The type of the entities that will have identity values assigned.</typeparam>
-public class IntegerIdentityStrategy<T> : IdentityStrategy<T, int>
+public class IntegerIdentityStrategy<T> : NumberIdentityStrategy<T, int>
     where T : class
 {
     /// <summary>
@@ -19,23 +19,5 @@ public class IntegerIdentityStrategy<T> : IdentityStrategy<T, int>
     public IntegerIdentityStrategy(Expression<Func<T, int>> property)
         : base(property)
     {
-        Generator = GenerateInt;
-    }
-
-    /// <summary>
-    ///     Returns a value indicating whether a given value equals the default, unset identity value.
-    /// </summary>
-    /// <param name="id">The identity value to examine.</param>
-    /// <returns>A value indicating whether a given value equals the default, unset identity value.</returns>
-    protected override bool IsDefaultUnsetValue(int id)
-    {
-        return id == 0;
-    }
-
-    private int GenerateInt()
-    {
-        SetLastValue(++LastValue);
-
-        return LastValue;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Highway.Data.Collections;
@@ -82,9 +83,9 @@ public class InMemoryActiveDataContext : InMemoryDataContext
         return 0;
     }
 
-    public override Task<int> CommitAsync()
+    public override Task<int> CommitAsync(CancellationToken cancellationToken = default)
     {
-        var commitAsync = new Task<int>(Commit);
+        var commitAsync = new Task<int>(Commit, cancellationToken);
         commitAsync.Start();
 
         return commitAsync;

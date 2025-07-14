@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,15 @@ namespace Highway.Data;
 
 public abstract class SqlCommand : ICommand
 {
-    protected Action<SqlConnection> ContextQuery;
+    protected Action<SqlConnection>? ContextQuery;
 
     public void Execute(IDataContext context)
     {
+        if (ContextQuery is null)
+        {
+            return;
+        }
+
         if (context is not DbContext efContext)
         {
             return;
@@ -24,10 +30,5 @@ public abstract class SqlCommand : ICommand
 
         using var conn = new SqlConnection(efContext.Database.GetConnectionString());
         ContextQuery.Invoke(conn);
-    }
-
-    public Task ExecuteAsync(IDataContext context)
-    {
-        throw new NotImplementedException();
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Highway.Data.Tests.TestDomain;
 
@@ -14,9 +13,4 @@ public class Foo : IIdentifiable<int>
     public virtual int Id { get; set; }
 
     public virtual string Name { get; set; }
-
-    public object Test()
-    {
-        throw new NotImplementedException();
-    }
 }

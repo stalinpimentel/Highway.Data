@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Highway.Data.Interceptors.Events;
@@ -55,9 +56,10 @@ public class Repository : IRepository
     ///     Executes a prebuilt <see cref="ICommand" /> asynchronously
     /// </summary>
     /// <param name="command">The prebuilt command object</param>
-    public virtual Task ExecuteAsync(ICommand command)
+    /// <param name="cancellationToken"></param>
+    public virtual Task ExecuteAsync(ICommand command, CancellationToken cancellationToken = default)
     {
-        var task = new Task(() => command.Execute(_context));
+        var task = new Task(() => command.Execute(_context), cancellationToken);
         task.Start();
 
         return task;
@@ -115,10 +117,11 @@ public class Repository : IRepository
     /// </summary>
     /// <typeparam name="T">The Entity being queried</typeparam>
     /// <param name="query">The prebuilt Query Object</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>The task that will return an instance of <typeparamref name="T" /> from the query</returns>
-    public virtual Task<T> FindAsync<T>(IScalar<T> query)
+    public virtual Task<T> FindAsync<T>(IScalar<T> query, CancellationToken cancellationToken = default)
     {
-        var task = new Task<T>(() => query.Execute(_context));
+        var task = new Task<T>(() => query.Execute(_context), cancellationToken);
         task.Start();
 
         return task;
@@ -129,10 +132,11 @@ public class Repository : IRepository
     /// </summary>
     /// <typeparam name="T">The Entity being queried</typeparam>
     /// <param name="query">The prebuilt Query Object</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>The task that will return <see cref="IEnumerable{T}" /> from the query</returns>
-    public virtual Task<IEnumerable<T>> FindAsync<T>(IQuery<T> query)
+    public virtual Task<IEnumerable<T>> FindAsync<T>(IQuery<T> query, CancellationToken cancellationToken = default)
     {
-        var task = new Task<IEnumerable<T>>(() => query.Execute(_context));
+        var task = new Task<IEnumerable<T>>(() => query.Execute(_context), cancellationToken);
         task.Start();
 
         return task;
@@ -145,10 +149,10 @@ public class Repository : IRepository
     /// <typeparam name="TProjection">The type being returned to the caller.</typeparam>
     /// <param name="query">The prebuilt Query Object</param>
     /// <returns>The task that will return <see cref="IEnumerable{T}" /> from the query</returns>
-    public virtual Task<IEnumerable<TProjection>> FindAsync<TSelection, TProjection>(IQuery<TSelection, TProjection> query)
+    public virtual Task<IEnumerable<TProjection>> FindAsync<TSelection, TProjection>(IQuery<TSelection, TProjection> query, CancellationToken cancellationToken = default)
         where TSelection : class
     {
-        var task = new Task<IEnumerable<TProjection>>(() => query.Execute(_context));
+        var task = new Task<IEnumerable<TProjection>>(() => query.Execute(_context), cancellationToken);
         task.Start();
 
         return task;

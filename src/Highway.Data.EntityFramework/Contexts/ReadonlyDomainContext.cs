@@ -11,12 +11,12 @@ public class ReadonlyDomainContext<T> : ReadonlyDataContext, IReadonlyDomainCont
     where T : class, IDomain
 {
     public ReadonlyDomainContext(T domain)
-        : base(domain.Options, domain.Mappings, domain.Context, new NoOpLogger())
+        : base(domain.Options, domain.Mappings, new NoOpLogger())
     {
     }
 
     public ReadonlyDomainContext(T domain, ILog logger)
-        : base(domain.Options, domain.Mappings, domain.Context, logger)
+        : base(domain.Options, domain.Mappings, logger)
     {
     }
 }

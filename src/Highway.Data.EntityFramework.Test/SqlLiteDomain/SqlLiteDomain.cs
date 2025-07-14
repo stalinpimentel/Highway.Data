@@ -12,7 +12,7 @@ public class SqlLiteDomain : IDomain
     
     public DbContextOptions Options { get; } 
 
-    public IContextConfiguration Context => new SqlLiteDomainContextConfiguration();
+    public IContextOptionsConfigurator ContextOptionsConfigurator => new SqlLiteDomainContextOptionsConfigurator();
 
     public List<IInterceptor> Events => new List<IInterceptor>();
 

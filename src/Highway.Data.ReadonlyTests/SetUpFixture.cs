@@ -25,14 +25,14 @@ public class SetUpFixture
     [AssemblyInitialize]
     public static void AssemblyInit(TestContext context)
     {
-        Console.WriteLine(context.TestName);
-
-        using var masterSqlConnection = new SqlConnection(Configuration.Instance.MasterConnectionString);
-        masterSqlConnection.Open();
-
-        using var command = masterSqlConnection.CreateCommand();
-        command.CommandText = $"CREATE DATABASE [{Configuration.Instance.TestDatabaseName}]";
-
-        command.ExecuteNonQuery();
+        // Console.WriteLine(context.TestName);
+        //
+        // using var masterSqlConnection = new SqlConnection(Configuration.Instance.MasterConnectionString);
+        // masterSqlConnection.Open();
+        //
+        // using var command = masterSqlConnection.CreateCommand();
+        // command.CommandText = $"CREATE DATABASE [{Configuration.Instance.TestDatabaseName}]";
+        //
+        // command.ExecuteNonQuery();
     }
 }

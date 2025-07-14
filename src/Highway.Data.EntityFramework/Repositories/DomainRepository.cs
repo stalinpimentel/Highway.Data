@@ -12,7 +12,7 @@ public class DomainRepository<T> : Repository, IDomainRepository<T>
     {
         _eventManager = new EventManager<T>(this);
 
-        if (domain.Events == null)
+        if (domain.Events is null)
         {
             return;
         }

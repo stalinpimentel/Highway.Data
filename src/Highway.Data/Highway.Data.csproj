@@ -11,6 +11,7 @@
 		<PackageTags>Architecture ORM Repository Specification Productivity</PackageTags>
 		<PackageReleaseNotes />
 		<PackageIcon>icon.png</PackageIcon>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>

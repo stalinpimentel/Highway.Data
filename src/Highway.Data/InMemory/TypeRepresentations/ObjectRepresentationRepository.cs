@@ -12,14 +12,8 @@ namespace Highway.Data.Contexts.TypeRepresentations;
 
 internal sealed class ObjectRepresentationRepository
 {
-    internal ConcurrentList<ObjectRepresentation> ObjectRepresentations = new ConcurrentList<ObjectRepresentation>();
-
-    public ObjectRepresentationRepository()
-    {
-        IdentityStrategies = new Dictionary<Type, Action<object>>();
-    }
-
-    public Dictionary<Type, Action<object>> IdentityStrategies { get; set; }
+    internal ConcurrentList<ObjectRepresentation> ObjectRepresentations = new();
+    public Dictionary<Type, Action<object>> IdentityStrategies { get; set; } = new();
 
     internal void Add<T>(T item)
         where T : class

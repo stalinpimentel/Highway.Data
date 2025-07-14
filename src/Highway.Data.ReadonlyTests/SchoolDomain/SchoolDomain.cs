@@ -10,18 +10,22 @@ public class SchoolDomain : IDomain
 {
     public string ConnectionString { get; } = Configuration.Instance.TestDatabaseConnectionString;
 
-    public DbContextOptions Options { get; }
+    public DbContextOptions Options
+    {
+        get
+        {
+            var builder = new DbContextOptionsBuilder()
+                .UseSqlServer(ConnectionString, opts => opts.EnableRetryOnFailure());
 
-    public IContextConfiguration Context { get; } = new DefaultContextConfiguration();
+            return ContextOptionsConfigurator is not null
+                ? ContextOptionsConfigurator.ConfigureContextOptions(builder).Options
+                : builder.Options;
+        }
+    }
+
+    public IContextOptionsConfigurator? ContextOptionsConfigurator { get; } = EmptyContextOptionsConfigurator.Instance;
 
     public List<IInterceptor> Events { get; } = new();
 
     public IMappingConfiguration Mappings { get; } = new SchoolMapping();
-
-    public SchoolDomain()
-    {
-        Options = new DbContextOptionsBuilder()
-                  .UseSqlServer(ConnectionString, opts => opts.EnableRetryOnFailure())
-            .Options;
-    }
 }

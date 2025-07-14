@@ -11,7 +11,7 @@ namespace Highway.Data.Factories;
 public class RepositoryFactory : IRepositoryFactory
 {
     private readonly string _connectionString;
-    private readonly IContextConfiguration _contextConfig;
+    private readonly IContextOptionsConfigurator? _contextConfig;
     private readonly ILog _logger;
     private readonly IMappingConfiguration? _mappings;
 
@@ -19,14 +19,14 @@ public class RepositoryFactory : IRepositoryFactory
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
     public RepositoryFactory(string connectionString, IMappingConfiguration mappings)
-        : this(connectionString, mappings, new DefaultContextConfiguration(), new NoOpLogger())
+        : this(connectionString, mappings, EmptyContextOptionsConfigurator.Instance, new NoOpLogger())
     {
     }
 
     /// <summary>
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
-    public RepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextConfiguration contextConfiguration)
+    public RepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextOptionsConfigurator? contextConfiguration)
         : this(connectionString, mappings, contextConfiguration, new NoOpLogger())
     {
     }
@@ -35,14 +35,14 @@ public class RepositoryFactory : IRepositoryFactory
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
     public RepositoryFactory(string connectionString, IMappingConfiguration mappings, ILog logger)
-        : this(connectionString, mappings, new DefaultContextConfiguration(), logger)
+        : this(connectionString, mappings, EmptyContextOptionsConfigurator.Instance, logger)
     {
     }
 
     /// <summary>
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
-    public RepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextConfiguration contextConfig, ILog logger)
+    public RepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextOptionsConfigurator? contextConfig, ILog logger)
     {
         _connectionString = connectionString;
         _mappings = mappings;
@@ -56,11 +56,14 @@ public class RepositoryFactory : IRepositoryFactory
     /// <returns>Domain specific repository</returns>
     public IRepository Create()
     {
-        var options = new DbContextOptionsBuilder()
-            .UseSqlServer(_connectionString, opts => opts.EnableRetryOnFailure())
-            .LogTo(_logger.Info)
-            .Options;
+        var builder = new DbContextOptionsBuilder()
+                      .UseSqlServer(_connectionString, opts => opts.EnableRetryOnFailure())
+                      .LogTo(_logger.Info);
         
-        return new Repository(new DataContext(options, _logger, _mappings, _contextConfig));
+        var options = _contextConfig is not null
+            ? _contextConfig.ConfigureContextOptions(builder).Options
+            : builder.Options;
+        
+        return new Repository(new DataContext(options, _logger, _mappings));
     }
 }

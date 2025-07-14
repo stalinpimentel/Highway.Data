@@ -18,12 +18,11 @@ public class ReadonlyDbContext : DbContext
     private readonly ILog _log;
     private readonly IMappingConfiguration? _mapping;
 
-    public ReadonlyDbContext(DbContextOptions options, IMappingConfiguration? mapping, IContextConfiguration? contextConfiguration, ILog log)
+    public ReadonlyDbContext(DbContextOptions options, IMappingConfiguration? mapping, ILog log)
         : base(options)
     {
         _log = log;
         _mapping = mapping;
-        contextConfiguration?.ConfigureContext(this);
     }
 
     public ReadonlyDbContext(DbContextOptions options, ILog log)
@@ -35,17 +34,17 @@ public class ReadonlyDbContext : DbContext
     
     public sealed override int SaveChanges()
     {
-        throw new NotImplementedException($"Do not call {nameof(SaveChanges)} on a {nameof(ReadonlyDbContext)}.");
+        throw new NotSupportedException($"Do not call {nameof(SaveChanges)} on a {nameof(ReadonlyDbContext)}.");
     }
     
     public sealed override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException($"Do not call {nameof(SaveChangesAsync)} on a {nameof(ReadonlyDbContext)}.");
+        throw new NotSupportedException($"Do not call {nameof(SaveChangesAsync)} on a {nameof(ReadonlyDbContext)}.");
     }
 
     public sealed override DbSet<TEntity> Set<TEntity>()
     {
-        throw new NotImplementedException($"Do not call {nameof(Set)} on a {nameof(ReadonlyDbContext)}.");
+        throw new NotSupportedException($"Do not call {nameof(Set)} on a {nameof(ReadonlyDbContext)}.");
     }
 
     public IEnumerable<T> ExecuteSqlQuery<T>(string sql, params DbParameter[] dbParams)
@@ -103,6 +102,6 @@ public class ReadonlyDbContext : DbContext
 
     protected bool ShouldValidateEntity(EntityEntry entityEntry)
     {
-        throw new NotImplementedException($"Do not call {nameof(ShouldValidateEntity)} on a {nameof(ReadonlyDbContext)}.");
+        throw new NotSupportedException($"Do not call {nameof(ShouldValidateEntity)} on a {nameof(ReadonlyDbContext)}.");
     }
 }

@@ -18,7 +18,7 @@ public class ReadonlyDomainRepositoryTests
     public static void ClassInit(TestContext context)
     {
         var schoolDomain = new SchoolDomain();
-        var domainRepositoryFactory = new DomainRepositoryFactory(new IDomain[] { schoolDomain });
+        var domainRepositoryFactory = new DomainRepositoryFactory([schoolDomain]);
         var domainRepository = domainRepositoryFactory.Create(typeof(SchoolDomain));
 
         var firstGrade = new Grade

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Common.Logging;
@@ -58,7 +59,7 @@ public class DataContext : DbContext, IEntityDataContext
     /// <param name="options">The db connection.</param>
     /// <param name="mapping">The Mapping Configuration that will determine how the tables and objects interact</param>
     public DataContext(DbContextOptions options, IMappingConfiguration mapping)
-        : this(options, new NoOpLogger(), mapping, new DefaultContextConfiguration())
+        : this(options, new NoOpLogger(), mapping)
     {
     }
 
@@ -72,7 +73,7 @@ public class DataContext : DbContext, IEntityDataContext
         DbContextOptions options,
         IMappingConfiguration mapping,
         ILog log)
-        : this(options, log, mapping, new DefaultContextConfiguration())
+        : this(options, log, mapping)
     {
     }
 
@@ -81,12 +82,10 @@ public class DataContext : DbContext, IEntityDataContext
     /// </summary>
     /// <param name="options">The context options.</param>
     /// <param name="mapping">The Mapping Configuration that will determine how the tables and objects interact</param>
-    /// <param name="contextConfiguration">The context specific configuration that will change context level behavior</param>
     public DataContext(
         DbContextOptions<DataContext> options,
-        IMappingConfiguration mapping,
-        IContextConfiguration contextConfiguration)
-        : this(options, new NoOpLogger(), mapping, contextConfiguration)
+        IMappingConfiguration mapping)
+        : this(options, new NoOpLogger(), mapping)
     {
     }
 
@@ -95,14 +94,12 @@ public class DataContext : DbContext, IEntityDataContext
     /// </summary>
     /// <param name="options">The context option.</param>
     /// <param name="mapping">The Mapping Configuration that will determine how the tables and objects interact</param>
-    /// <param name="contextConfiguration">The context specific configuration that will change context level behavior</param>
     /// <param name="log">The logger being supplied for this context ( Optional )</param>
-    public DataContext(DbContextOptions options, ILog log, IMappingConfiguration? mapping, IContextConfiguration? contextConfiguration = null)
+    public DataContext(DbContextOptions options, ILog log, IMappingConfiguration? mapping)
         : base(options)
     {
         _mapping = mapping;
         _log = log;
-        contextConfiguration?.ConfigureContext(this);
     }
 
     public event EventHandler<BeforeSaveEventArgs>? BeforeSave;
@@ -179,12 +176,12 @@ public class DataContext : DbContext, IEntityDataContext
     ///     Commits all currently tracked entity changes asynchronously
     /// </summary>
     /// <returns>the number of rows affected</returns>
-    public virtual async Task<int> CommitAsync()
+    public virtual async Task<int> CommitAsync(CancellationToken cancellationToken = default)
     {
         OnBeforeSave();
         _log.Trace("\tCommit");
         ChangeTracker.DetectChanges();
-        var result = await SaveChangesAsync();
+        var result = await SaveChangesAsync(cancellationToken);
         _log.DebugFormat("\tCommitted {0} Changes", result);
         OnAfterSave();
 

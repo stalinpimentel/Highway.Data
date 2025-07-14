@@ -15,7 +15,7 @@ public class DomainContext<T> : DataContext, IDomainContext<T>
     /// </summary>
     /// <param name="domain"></param>
     public DomainContext(T domain)
-        : base(domain.Options, new NoOpLogger(), domain.Mappings, domain.Context)
+        : base(domain.Options, new NoOpLogger(), domain.Mappings)
     {
     }
 
@@ -25,7 +25,7 @@ public class DomainContext<T> : DataContext, IDomainContext<T>
     /// <param name="domain">domain for context</param>
     /// <param name="logger">logger</param>
     public DomainContext(T domain, ILog logger)
-        : base(domain.Options, logger, domain.Mappings, domain.Context)
+        : base(domain.Options, logger, domain.Mappings)
     {
     }
 }

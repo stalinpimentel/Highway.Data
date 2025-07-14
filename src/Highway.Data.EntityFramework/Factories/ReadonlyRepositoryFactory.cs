@@ -8,7 +8,7 @@ namespace Highway.Data.Factories;
 public class ReadonlyRepositoryFactory : IReadonlyRepositoryFactory
 {
     private readonly string _connectionString;
-    private readonly IContextConfiguration _contextConfig;
+    private readonly IContextOptionsConfigurator? _contextConfig;
     private readonly ILog _logger;
     private readonly IMappingConfiguration _mappings;
 
@@ -16,15 +16,15 @@ public class ReadonlyRepositoryFactory : IReadonlyRepositoryFactory
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
     public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings)
-        : this(connectionString, mappings, new DefaultContextConfiguration(), new NoOpLogger())
+        : this(connectionString, mappings, EmptyContextOptionsConfigurator.Instance, new NoOpLogger())
     {
     }
 
     /// <summary>
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
-    public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextConfiguration contextConfiguration)
-        : this(connectionString, mappings, contextConfiguration, new NoOpLogger())
+    public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextOptionsConfigurator contextOptionsConfigurator)
+        : this(connectionString, mappings, contextOptionsConfigurator, new NoOpLogger())
     {
     }
 
@@ -32,14 +32,14 @@ public class ReadonlyRepositoryFactory : IReadonlyRepositoryFactory
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
     public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings, ILog logger)
-        : this(connectionString, mappings, new DefaultContextConfiguration(), logger)
+        : this(connectionString, mappings, EmptyContextOptionsConfigurator.Instance, logger)
     {
     }
 
     /// <summary>
     ///     Creates a repository factory for the supplied list of domains
     /// </summary>
-    public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextConfiguration contextConfig, ILog logger)
+    public ReadonlyRepositoryFactory(string connectionString, IMappingConfiguration mappings, IContextOptionsConfigurator? contextConfig, ILog logger)
     {
         _connectionString = connectionString;
         _contextConfig = contextConfig;
@@ -53,10 +53,13 @@ public class ReadonlyRepositoryFactory : IReadonlyRepositoryFactory
     /// <returns>Domain specific repository</returns>
     public IReadonlyRepository CreateReadonly()
     {
-        var options = new DbContextOptionsBuilder()
-            .UseSqlServer(_connectionString, opts => opts.EnableRetryOnFailure())
-            .LogTo(_logger.Info)
-            .Options;
-        return new ReadonlyRepository(new ReadonlyDataContext(options, _mappings, _contextConfig, _logger));
+        var builder = new DbContextOptionsBuilder()
+                      .UseSqlServer(_connectionString, opts => opts.EnableRetryOnFailure())
+                      .LogTo(_logger.Info);
+
+        var options = _contextConfig is not null
+            ? _contextConfig.ConfigureContextOptions(builder).Options
+            : builder.Options;
+        return new ReadonlyRepository(new ReadonlyDataContext(options, _mappings,_logger));
     }
 }

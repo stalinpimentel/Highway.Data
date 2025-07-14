@@ -43,7 +43,7 @@ public class DropCreateInitializer<T>
             }
         }
 
-        if (_seedAction is null)
+        if (_seedAction is not null)
         {
             _seedAction(context);
             context.SaveChanges();

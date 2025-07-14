@@ -6,6 +6,8 @@
 /// </summary>
 public class InterceptorResult
 {
+    private static readonly InterceptorResult _Succeeded = new InterceptorResult{ ContinueExecution = true };
+    
     internal InterceptorResult()
     {
     }
@@ -40,11 +42,5 @@ public class InterceptorResult
     ///     Creates a successful result that continues execution
     /// </summary>
     /// <returns>An Interceptor Result</returns>
-    public static InterceptorResult Succeeded()
-    {
-        return new InterceptorResult
-        {
-            ContinueExecution = true
-        };
-    }
+    public static InterceptorResult Succeeded() => _Succeeded;
 }

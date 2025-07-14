@@ -44,10 +44,13 @@ public class GivenAContextWithoutMappings
     [TestInitialize]
     public void Setup()
     {
-        // TODO: Review how to do initializers in EF Core
-        // Database.SetInitializer(new EntityFrameworkInitializer());
         var options = new DbContextOptionsBuilder()
                       .UseSqlServer("Data Source=(localDb);Initial Catalog=Highway.Data.Test.Db;Integrated Security=True;Connection Timeout=1", opts => opts.EnableRetryOnFailure())
+                      .UseSeeding((context, _) =>
+                      {
+                          var initializer = new EntityFrameworkInitializer();
+                          initializer.InitializeDatabase((TestDataContext)context);
+                      })
                       .Options;
         
         _mapping = new FooMappingConfiguration();

@@ -16,7 +16,7 @@ public class RemoveById<TId, T> : Command
         ContextQuery = context =>
         {
             var item = context.AsQueryable<T>().FirstOrDefault(x => x.Id.Equals(id));
-            if (item == null)
+            if (item is null)
             {
                 return;
             }

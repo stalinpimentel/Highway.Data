@@ -30,6 +30,11 @@ public class DomainRepositoryFactory : IDomainRepositoryFactory, IReadonlyDomain
         where T : class, IDomain
     {
         var domain = _domains.OfType<T>().SingleOrDefault();
+        if (domain is null)
+        {
+            throw new ArgumentException($"Domain {typeof(T).Name} does not exist");
+        }
+
         var context = new DomainContext<T>(domain);
 
         return new DomainRepository<T>(context, domain);

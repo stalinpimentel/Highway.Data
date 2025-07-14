@@ -8,7 +8,7 @@ namespace Highway.Data.Contexts;
 ///     type short.
 /// </summary>
 /// <typeparam name="T">The type of the entities that will have identity values assigned.</typeparam>
-public class ShortIdentityStrategy<T> : IdentityStrategy<T, short>
+public class ShortIdentityStrategy<T> : NumberIdentityStrategy<T, short>
     where T : class
 {
     /// <summary>
@@ -19,23 +19,5 @@ public class ShortIdentityStrategy<T> : IdentityStrategy<T, short>
     public ShortIdentityStrategy(Expression<Func<T, short>> property)
         : base(property)
     {
-        Generator = GenerateShort;
-    }
-
-    /// <summary>
-    ///     Returns a value indicating whether a given value equals the default, unset identity value.
-    /// </summary>
-    /// <param name="id">The identity value to examine.</param>
-    /// <returns>A value indicating whether a given value equals the default, unset identity value.</returns>
-    protected override bool IsDefaultUnsetValue(short id)
-    {
-        return id == 0;
-    }
-
-    private short GenerateShort()
-    {
-        SetLastValue(++LastValue);
-
-        return LastValue;
     }
 }
