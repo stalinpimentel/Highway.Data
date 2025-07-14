@@ -1,7 +1,6 @@
-﻿namespace Highway.Data.Contexts
+﻿namespace Highway.Data.Contexts;
+
+public class InMemoryDomainContext<T> : InMemoryDataContext, IDomainContext<T>
+    where T : class
 {
-    public class InMemoryDomainContext<T> : InMemoryDataContext, IDomainContext<T>
-        where T : class
-    {
-    }
 }

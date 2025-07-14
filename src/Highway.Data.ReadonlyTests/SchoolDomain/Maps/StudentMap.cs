@@ -1,13 +1,13 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Highway.Data.ReadonlyTests
+namespace Highway.Data.ReadonlyTests;
+
+public sealed class StudentMap : IEntityTypeConfiguration<Student>
 {
-    public class StudentMap : EntityTypeConfiguration<Student>
+    public void Configure(EntityTypeBuilder<Student> builder)
     {
-        public StudentMap()
-        {
-            ToTable("Student");
-            HasKey(x => x.StudentID);
-        }
+        builder.ToTable("Student");
+        builder.HasKey(x => x.StudentID);
     }
 }

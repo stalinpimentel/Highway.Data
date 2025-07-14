@@ -8,49 +8,48 @@ using Highway.Data.Tests.InMemory.Domain;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Highway.Data.Tests.InMemory.BugTests
+namespace Highway.Data.Tests.InMemory.BugTests;
+
+[TestClass]
+public class TestPopulateReferences
 {
-    [TestClass]
-    public class TestPopulateReferences
+    [TestMethod]
+    public void ShouldPopulateBackReferenceCollections()
     {
-        [TestMethod]
-        public void ShouldPopulateBackReferenceCollections()
+        // Arrange
+        var context = new InMemoryDataContext();
+        var blog = new Blog();
+        var post = new Post { Blog = blog };
+        context.Add(post);
+        context.Commit();
+
+        // Act
+        var fetchedBlog = context.AsQueryable<Blog>().First();
+
+        // Assert
+        fetchedBlog.Posts.Should().HaveCount(1);
+    }
+
+    [TestMethod]
+    public void ShouldPopulateBackReferenceSingleProperty()
+    {
+        // Arrange
+        var context = new InMemoryDataContext();
+        var blog = new Blog
         {
-            // Arrange
-            var context = new InMemoryDataContext();
-            var blog = new Blog();
-            var post = new Post { Blog = blog };
-            context.Add(post);
-            context.Commit();
-
-            // Act
-            var fetchedBlog = context.AsQueryable<Blog>().First();
-
-            // Assert
-            fetchedBlog.Posts.Should().HaveCount(1);
-        }
-
-        [TestMethod]
-        public void ShouldPopulateBackReferenceSingleProperty()
-        {
-            // Arrange
-            var context = new InMemoryDataContext();
-            var blog = new Blog
+            Posts = new List<Post>
             {
-                Posts = new List<Post>
-                {
-                    new Post()
-                }
-            };
+                new Post()
+            }
+        };
 
-            context.Add(blog);
-            context.Commit();
+        context.Add(blog);
+        context.Commit();
 
-            // Act
-            var fetchedPost = context.AsQueryable<Post>().First();
+        // Act
+        var fetchedPost = context.AsQueryable<Post>().First();
 
-            // Assert
-            fetchedPost.Blog.Should().NotBeNull();
-        }
+        // Assert
+        fetchedPost.Blog.Should().NotBeNull();
     }
 }

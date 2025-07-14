@@ -1,16 +1,16 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using Highway.Data.Tests.TestDomain;
 
-using Highway.Data.Tests.TestDomain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
+namespace Highway.Data.EntityFramework.Test.TestDomain;
+
+public sealed class QuxMap : IEntityTypeConfiguration<Qux>
 {
-    public class QuxMap : EntityTypeConfiguration<Qux>
+    public void Configure(EntityTypeBuilder<Qux> builder)
     {
-        public QuxMap()
-        {
-            ToTable("Quxs");
-            HasKey(x => x.Id);
-            Property(x => x.Name).IsOptional();
-        }
+        builder.ToTable("Quxs");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Name).IsRequired(false);
     }
 }

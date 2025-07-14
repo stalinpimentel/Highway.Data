@@ -1,6 +1,5 @@
-﻿namespace Highway.Data.Test.InMemory.BugTests.ReadonlyProperties.ParentsWithIgnoredReadonlyChildren
+﻿namespace Highway.Data.Test.InMemory.BugTests.ReadonlyProperties.ParentsWithIgnoredReadonlyChildren;
+
+public class Parent : ParentBase
 {
-    public class Parent : ParentBase
-    {
-    }
 }

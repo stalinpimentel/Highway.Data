@@ -1,13 +1,12 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
+namespace Highway.Data.EntityFramework.Test.TestDomain;
+
+public class BazMappingConfiguration : BaseMappingConfiguration
 {
-    public class BazMappingConfiguration : BaseMappingConfiguration
+    public override void ConfigureModelBuilder(ModelBuilder modelBuilder)
     {
-        public override void ConfigureModelBuilder(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Configurations.Add(new BazMap());
-            base.ConfigureModelBuilder(modelBuilder);
-        }
+        modelBuilder.ApplyConfiguration(new BazMap());
+        base.ConfigureModelBuilder(modelBuilder);
     }
 }
