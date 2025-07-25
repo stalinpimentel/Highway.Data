@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ internal sealed class ObjectRepresentationRepository
     internal void Add<T>(T item)
         where T : class
     {
-        if (EntityExistsInRepository(item))
+        if (EntityExistsInRepository(item, out _))
         {
             return;
         }
@@ -45,9 +46,10 @@ internal sealed class ObjectRepresentationRepository
         return ObjectRepresentations.Where(x => x.Entity is T).Select(x => x.Entity).Cast<T>().AsQueryable();
     }
 
-    internal bool EntityExistsInRepository(object item)
+    private bool EntityExistsInRepository(object item, [NotNullWhen(true)] out ObjectRepresentation? representation)
     {
-        return ObjectRepresentations.Any(x => x.Entity == item);
+        representation = ObjectRepresentations.SingleOrDefault(x => x.Entity == item);
+        return representation is not null;
     }
 
     internal bool Remove<T>(T item)
@@ -144,19 +146,18 @@ internal sealed class ObjectRepresentationRepository
 
     private ObjectRepresentation CreateChildObjectRepresentation(
         object item,
-        object parent = null,
-        Action removeAction = null,
-        Func<object, object, object> getterFunc = null)
+        object? parent = null,
+        Action? removeAction = null,
+        Func<object, object, object>? getterFunc = null)
     {
-        if (EntityExistsInRepository(item))
+        if (EntityExistsInRepository(item, out var representation))
         {
-            var objectRepresentation = ObjectRepresentations.SingleOrDefault(x => x.Entity == item);
-            if (!objectRepresentation.Parents.ContainsKey(parent))
+            if (!representation.Parents.ContainsKey(parent))
             {
-                objectRepresentation.Parents.Add(parent, new Accessor(removeAction, getterFunc));
+                representation.Parents.Add(parent, new Accessor(removeAction, getterFunc));
             }
 
-            return objectRepresentation;
+            return representation;
         }
         else
         {
@@ -209,13 +210,13 @@ internal sealed class ObjectRepresentationRepository
             }
 
             var list = CreateGenericList(childItem.GetType());
-            var mListAdd = list.GetType().GetMethod("Add");
+            var mListAdd = list.GetType().GetMethod("Add")!;
             var childItems = (IEnumerable)items;
             foreach (var itemInList in childItems)
             {
                 if (itemInList != childItem)
                 {
-                    mListAdd.Invoke(list, new[] { itemInList });
+                    mListAdd.Invoke(list, [itemInList]);
                 }
             }
 

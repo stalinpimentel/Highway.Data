@@ -12,7 +12,7 @@ internal class ObjectRepresentation
 
     internal object Entity { get; set; }
 
-    internal Dictionary<object, Accessor> Parents { get; set; }
+    internal Dictionary<object, Accessor?> Parents { get; set; }
 
     internal IEnumerable<ObjectRepresentation> RelatedEntities { get; set; }
 
