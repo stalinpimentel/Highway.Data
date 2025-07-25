@@ -11,10 +11,11 @@
 		<PackageTags>Architecture ORM Repository Specification Productivity</PackageTags>
 		<PackageReleaseNotes />
 		<PackageIcon>icon.png</PackageIcon>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
+		<TargetFramework>net9.0</TargetFramework>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 

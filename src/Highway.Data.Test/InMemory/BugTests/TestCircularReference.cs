@@ -4,57 +4,56 @@ using Highway.Data.Contexts;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Highway.Data.Tests.InMemory.BugTests
+namespace Highway.Data.Tests.InMemory.BugTests;
+
+[TestClass]
+public class TestCircularReference
 {
-    [TestClass]
-    public class TestCircularReference
+    private Child _child;
+
+    private IDataContext _context;
+
+    private Parent _parent;
+
+    [TestInitialize]
+    public void SetUp()
     {
-        private Child _child;
+        _context = new InMemoryDataContext();
 
-        private IDataContext _context;
+        _parent = new Parent();
+        _child = new Child();
+        _parent.Child = _child;
+        _child.Parent = _parent;
 
-        private Parent _parent;
+        _context.Add(_parent);
+        _context.Commit();
+    }
 
-        [TestInitialize]
-        public void SetUp()
-        {
-            _context = new InMemoryDataContext();
+    [TestMethod]
+    public void ShouldGetSingleChildWithParent()
+    {
+        var child = _context.AsQueryable<Child>().Single();
 
-            _parent = new Parent();
-            _child = new Child();
-            _parent.Child = _child;
-            _child.Parent = _parent;
+        Assert.AreEqual(_child, child);
+        Assert.AreEqual(_parent, child.Parent);
+    }
 
-            _context.Add(_parent);
-            _context.Commit();
-        }
+    [TestMethod]
+    public void ShouldGetSingleParentWithChild()
+    {
+        var parent = _context.AsQueryable<Parent>().Single();
 
-        [TestMethod]
-        public void ShouldGetSingleChildWithParent()
-        {
-            var child = _context.AsQueryable<Child>().Single();
+        Assert.AreEqual(_parent, parent);
+        Assert.AreEqual(_child, parent.Child);
+    }
 
-            Assert.AreEqual(_child, child);
-            Assert.AreEqual(_parent, child.Parent);
-        }
+    private class Child
+    {
+        public Parent Parent { get; set; }
+    }
 
-        [TestMethod]
-        public void ShouldGetSingleParentWithChild()
-        {
-            var parent = _context.AsQueryable<Parent>().Single();
-
-            Assert.AreEqual(_parent, parent);
-            Assert.AreEqual(_child, parent.Child);
-        }
-
-        private class Child
-        {
-            public Parent Parent { get; set; }
-        }
-
-        private class Parent
-        {
-            public Child Child { get; set; }
-        }
+    private class Parent
+    {
+        public Child Child { get; set; }
     }
 }

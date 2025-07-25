@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Highway.Data
+namespace Highway.Data;
+
+/// <summary>
+///     Contract for a readonly Data Context
+/// </summary>
+public interface IReadonlyDataContext : IDataSource, IDisposable
 {
-    /// <summary>
-    ///     Contract for a readonly Data Context
-    /// </summary>
-    public interface IReadonlyDataContext : IDataSource, IDisposable
-    {
-    }
 }

@@ -1,9 +1,8 @@
 using System;
 
-namespace Highway.Data.Contexts
+namespace Highway.Data.Contexts;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class InMemoryIgnoreAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class InMemoryIgnoreAttribute : Attribute
-    {
-    }
 }

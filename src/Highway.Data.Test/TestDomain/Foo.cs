@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Highway.Data.Tests.TestDomain
+namespace Highway.Data.Tests.TestDomain;
+
+public class Foo : IIdentifiable<int>
 {
-    public class Foo : IIdentifiable<int>
-    {
-        public virtual string Address { get; set; }
+    public virtual string Address { get; set; }
 
-        public Bar Bar { get; set; }
+    public Bar Bar { get; set; }
 
-        public ICollection<Bar> Bars { get; set; }
+    public ICollection<Bar> Bars { get; set; }
 
-        public virtual int Id { get; set; }
+    public virtual int Id { get; set; }
 
-        public virtual string Name { get; set; }
-
-        public object Test()
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public virtual string Name { get; set; }
 }

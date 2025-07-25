@@ -2,26 +2,25 @@
 
 using Highway.Data.Interceptors.Events;
 
-namespace Highway.Data
+namespace Highway.Data;
+
+public interface IDomainRepository<in T> : IRepository
+    where T : class
 {
-    public interface IDomainRepository<in T> : IRepository
-        where T : class
-    {
-        event EventHandler<BeforeQuery> BeforeQuery;
+    event EventHandler<BeforeQuery> BeforeQuery;
 
-        event EventHandler<BeforeScalar> BeforeScalar;
+    event EventHandler<BeforeScalar> BeforeScalar;
 
-        event EventHandler<BeforeCommand> BeforeCommand;
+    event EventHandler<BeforeCommand> BeforeCommand;
 
-        event EventHandler<AfterQuery> AfterQuery;
+    event EventHandler<AfterQuery> AfterQuery;
 
-        event EventHandler<AfterScalar> AfterScalar;
+    event EventHandler<AfterScalar> AfterScalar;
 
-        event EventHandler<AfterCommand> AfterCommand;
+    event EventHandler<AfterCommand> AfterCommand;
 
-        /// <summary>
-        ///     Gets the contract for a Domain Context
-        /// </summary>
-        IDomainContext<T> DomainContext { get; }
-    }
+    /// <summary>
+    ///     Gets the contract for a Domain Context
+    /// </summary>
+    IDomainContext<T> DomainContext { get; }
 }

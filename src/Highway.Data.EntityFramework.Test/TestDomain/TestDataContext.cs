@@ -1,14 +1,6 @@
 ﻿using Common.Logging;
+using Microsoft.EntityFrameworkCore;
 
-namespace Highway.Data.EntityFramework.Test.TestDomain
-{
-    public class TestDataContext : DataContext
-    {
-        public TestDataContext(string connectionString, IMappingConfiguration mapping, ILog logger)
-            : base(connectionString, mapping, null, logger)
-        {
-        }
+namespace Highway.Data.EntityFramework.Test.TestDomain;
 
-        public string ConnectionString { get; set; }
-    }
-}
+public class TestDataContext(DbContextOptions options, IMappingConfiguration mapping, ILog logger) : DataContext(options, logger, mapping);

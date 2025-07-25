@@ -1,9 +1,8 @@
-﻿namespace Highway.Data.Tests.TestDomain
-{
-    public class Qux
-    {
-        public int Id { get; set; }
+﻿namespace Highway.Data.Tests.TestDomain;
 
-        public string Name { get; set; }
-    }
+public class Qux
+{
+    public int Id { get; set; }
+
+    public string? Name { get; set; }
 }

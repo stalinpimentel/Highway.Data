@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace Highway.Data.Interceptors.Events
-{
-    /// <summary>
-    ///     Intercepts before the scalar execute
-    /// </summary>
-    public class BeforeScalar : EventArgs
-    {
-        public BeforeScalar(object query)
-        {
-            Query = query;
-        }
+namespace Highway.Data.Interceptors.Events;
 
-        public object Query { get; set; }
+/// <summary>
+///     Intercepts before the scalar execute
+/// </summary>
+public class BeforeScalar : EventArgs
+{
+    public BeforeScalar(object query)
+    {
+        Query = query;
     }
+
+    public object Query { get; set; }
 }

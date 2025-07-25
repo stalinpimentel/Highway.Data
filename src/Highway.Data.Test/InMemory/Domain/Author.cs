@@ -1,22 +1,21 @@
 ﻿using System;
 
-namespace Highway.Data.Tests.InMemory.Domain
+namespace Highway.Data.Tests.InMemory.Domain;
+
+public class Author
 {
-    public class Author
+    public Author()
     {
-        public Author()
-        {
-            Id = Guid.NewGuid();
-        }
-
-        public string Email { get; set; }
-
-        public string FirstName { get; set; }
-
-        public Guid Id { get; set; }
-
-        public string LastName { get; set; }
-
-        public string TwitterHandle { get; set; }
+        Id = Guid.NewGuid();
     }
+
+    public string Email { get; set; }
+
+    public string FirstName { get; set; }
+
+    public Guid Id { get; set; }
+
+    public string LastName { get; set; }
+
+    public string TwitterHandle { get; set; }
 }
